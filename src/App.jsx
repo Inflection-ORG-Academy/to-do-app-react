@@ -3,12 +3,18 @@ import { useState } from "react";
 
 function App() {
   const [inputValue, setInputValue] = useState(""); // task Input State
-  const [tasks, setTasks] = useState([]);
+  const [tasks, setTasks] = useState(() => {
+    return JSON.parse(localStorage.getItem("tasks")) || [];
+  }); // Tasks State
 
   const updateTask = (e) => {
     e.preventDefault();
     if (inputValue) {
       setTasks([{ task: inputValue, isDone: false }, ...tasks]);
+      localStorage.setItem(
+        "tasks",
+        JSON.stringify([{ task: inputValue, isDone: false }, ...tasks])
+      );
       // setTasks((prevTasks) => [...prevTasks, inputValue]);
       setInputValue("");
     }
@@ -37,36 +43,83 @@ function App() {
             Add
           </button>
         </form>
-        <ul className="mt-5 grid gap-2 divide-y divide-gray-400">
-          {tasks.map((task, index) => (
-            <li
-              className={`flex justify-between pb-2 ${
-                task.isDone && "line-through decoration-gray-900"
-              }`}
-              key={index}
-            >
-              <span>{task.task}</span>
-              <div className="flex gap-2">
-                {!task.isDone && (
-                  <Check
-                    size={20}
-                    className="text-gray-500 cursor-pointer hover:text-green-900"
-                    onClick={() => {
-                      const newTasks = [...tasks];
-                      newTasks[index].isDone = true;
-                      setTasks(newTasks);
-                    }}
-                  />
-                )}
+        {/* Pending Tasks */}
+        {tasks.length > 0 && (
+          <section>
+            <h3 className="font-semibold">Pending Tasks</h3>
+            <ul className="mt-5 grid gap-2 divide-y divide-gray-400">
+              {tasks.map((task, index) => {
+                if (task.isDone !== true) {
+                  return (
+                    <li
+                      className={`flex justify-between pb-2 ${
+                        task.isDone && "line-through decoration-gray-900"
+                      }`}
+                      key={index}
+                    >
+                      <span>{task.task}</span>
+                      <div className="flex gap-2">
+                        {!task.isDone && (
+                          <Check
+                            size={20}
+                            className="text-gray-500 cursor-pointer hover:text-green-900"
+                            onClick={() => {
+                              const newTasks = [...tasks]; // Copying the tasks array
+                              newTasks[index].isDone = true; // Updating the task status
+                              setTasks(newTasks); // Updating the tasks array
+                            }}
+                          />
+                        )}
 
-                <X
-                  size={20}
-                  className="text-gray-500 cursor-pointer hover:text-red-600"
-                />
-              </div>
-            </li>
-          ))}
-        </ul>
+                        <X
+                          size={20}
+                          className="text-gray-500 cursor-pointer hover:text-red-600"
+                          onClick={() => {
+                            const newTasks = [...tasks]; // Copying the tasks array
+                            newTasks.splice(index, 1); // Removing the task from the array
+                            setTasks(newTasks); // Updating the tasks array
+                          }}
+                        />
+                      </div>
+                    </li>
+                  );
+                }
+              })}
+            </ul>
+          </section>
+        )}
+        {/* Completed Tasks */}
+        {tasks.length > 0 && (
+          <section className="mt-5">
+            <h3 className="font-semibold">Completed Tasks</h3>
+            <ul className="mt-5 grid gap-2 divide-y divide-gray-400">
+              {tasks.map((task, index) => {
+                if (task.isDone == true) {
+                  return (
+                    <li
+                      className={`flex justify-between pb-2 ${
+                        task.isDone && "line-through decoration-gray-900"
+                      }`}
+                      key={index}
+                    >
+                      <span>{task.task}</span>
+
+                      <X
+                        size={20}
+                        className="text-gray-500 cursor-pointer hover:text-red-600"
+                        onClick={() => {
+                          const newTasks = [...tasks]; // Copying the tasks array
+                          newTasks.splice(index, 1); // Removing the task from the array
+                          setTasks(newTasks); // Updating the tasks array
+                        }}
+                      />
+                    </li>
+                  );
+                }
+              })}
+            </ul>
+          </section>
+        )}
       </section>
     </section>
   );
