@@ -2,7 +2,7 @@ import { Check, X } from "lucide-react";
 import { useState } from "react";
 
 function App() {
-  const [inputValue, setInputValue] = useState(""); // task Input State
+  const [inputValue, setInputValue] = useState(""); // Input Value State
   const [tasks, setTasks] = useState(() => {
     return JSON.parse(localStorage.getItem("tasks")) || [];
   }); // Tasks State
@@ -18,6 +18,21 @@ function App() {
       // setTasks((prevTasks) => [...prevTasks, inputValue]);
       setInputValue("");
     }
+  };
+
+  const deleteTask = (index) => {
+    const newTasks = [...tasks]; // Copying the tasks array
+    newTasks.splice(index, 1); // Removing the task from the array
+    setTasks(newTasks); // Updating the tasks array
+    localStorage.setItem("tasks", JSON.stringify(newTasks));
+  };
+
+  const completeTask = (index) => {
+    const newTasks = [...tasks]; // Copying the tasks array
+    newTasks[index].isDone = true; // Updating the task status
+    setTasks(newTasks); // Updating the tasks array
+
+    localStorage.setItem("tasks", JSON.stringify(newTasks));
   };
 
   return (
@@ -64,9 +79,7 @@ function App() {
                             size={20}
                             className="text-gray-500 cursor-pointer hover:text-green-900"
                             onClick={() => {
-                              const newTasks = [...tasks]; // Copying the tasks array
-                              newTasks[index].isDone = true; // Updating the task status
-                              setTasks(newTasks); // Updating the tasks array
+                              completeTask(index);
                             }}
                           />
                         )}
@@ -75,9 +88,7 @@ function App() {
                           size={20}
                           className="text-gray-500 cursor-pointer hover:text-red-600"
                           onClick={() => {
-                            const newTasks = [...tasks]; // Copying the tasks array
-                            newTasks.splice(index, 1); // Removing the task from the array
-                            setTasks(newTasks); // Updating the tasks array
+                            deleteTask(index);
                           }}
                         />
                       </div>
@@ -108,9 +119,7 @@ function App() {
                         size={20}
                         className="text-gray-500 cursor-pointer hover:text-red-600"
                         onClick={() => {
-                          const newTasks = [...tasks]; // Copying the tasks array
-                          newTasks.splice(index, 1); // Removing the task from the array
-                          setTasks(newTasks); // Updating the tasks array
+                          deleteTask(index);
                         }}
                       />
                     </li>
